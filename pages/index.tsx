@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 
 import Link from 'next/link';
 
+import DOMPurify from 'dompurify';
 import { Exo } from 'next/font/google';
 import { FaReact } from 'react-icons/fa';
 import { toast } from 'sonner';
@@ -41,18 +42,20 @@ export default function Home() {
         return;
       }
 
+      const sanitizedMessage = DOMPurify.sanitize(inputValue);
+
       try {
         const response = await fetch('/api/send-email', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ message: inputValue }),
+          body: JSON.stringify({ message: sanitizedMessage }),
         });
 
         if (response.ok) {
           toast('Link status', {
-            description: 'Please enter a message',
+            description: 'Message sent successfully',
           });
         } else {
           const data = await response.json();
@@ -84,7 +87,7 @@ export default function Home() {
   const endIndex = startIndex + itemsPerPage;
   const paginatedItems = filteredItems.slice(startIndex, endIndex);
 
-  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
   return (
     <main className={`flex h-screen flex-col items-center p-24 pt-10 pb-2 ${exo.className}`}>
@@ -101,7 +104,7 @@ export default function Home() {
           placeholder="Search..."
           className="mx-auto w-96"
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={e => setSearchQuery(DOMPurify.sanitize(e.target.value))}
         />
 
         <Dialog>
@@ -121,7 +124,7 @@ export default function Home() {
                   id="name"
                   defaultValue="https://example.com"
                   value={inputValue}
-                  onChange={e => setInputValue(e.target.value)}
+                  onChange={e => setInputValue(DOMPurify.sanitize(e.target.value))}
                 />
               </div>
             </div>
