@@ -17,4 +17,7 @@
 2. **View Submissions:** Browse through the list of submitted links, with a detailed view including title, description, and submission date.
 3. **Pagination:** Navigate through multiple pages of submissions with easy pagination controls.
 
+<a href="https://www.buymeacoffee.com/ozergklp" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
+
 
