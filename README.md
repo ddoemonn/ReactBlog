@@ -12,7 +12,7 @@
 
 ## How It Works
 
-1. **Submit a Link:** Use the form to submit your link, providing a title, description, and optionally an image link.
+1. **Submit a Link:** Use the input to submit your link.
 2. **View Submissions:** Browse through the list of submitted links, with a detailed view including title, description, and submission date.
 3. **Pagination:** Navigate through multiple pages of submissions with easy pagination controls.
 
