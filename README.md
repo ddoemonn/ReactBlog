@@ -1,5 +1,5 @@
 # ReactBlog
-![WhatsApp Image 2024-08-04 at 16 51 54](https://github.com/user-attachments/assets/50783bf8-3fc8-4dee-b31f-2b86587c5265)
+![WhatsApp Image 2024-08-04 at 18 10 39](https://github.com/user-attachments/assets/439d2bcd-33b6-4136-b27f-aa8bc5932566)
 
 **ReactBlog** is a platform where users can post and share links related to React. Whether it's articles, repositories, or any other resources about React, you can submit them here and stay updated with the latest in the React community.
 
