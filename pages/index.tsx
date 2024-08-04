@@ -27,22 +27,37 @@ const exo = Exo({ subsets: ['latin'] });
 
 export default function Home() {
   const [inputValue, setInputValue] = useState<string>('');
+  const [emailValue, setEmailValue] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const itemsPerPage = 4;
+
+  const isValidEmail = (email: string) => {
+    // Simple regex for email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  };
 
   const handleSubmit = useCallback(
     async (event: React.FormEvent) => {
       event.preventDefault();
 
-      if (!inputValue.trim()) {
-        toast('Link status', {
-          description: 'Please enter a message',
+      if (!inputValue.trim() || !emailValue.trim()) {
+        toast('Link status error', {
+          description: 'Please enter both email and message',
+        });
+        return;
+      }
+
+      if (!isValidEmail(emailValue)) {
+        toast('Link status error', {
+          description: 'Please enter a valid email address',
         });
         return;
       }
 
       const sanitizedMessage = DOMPurify.sanitize(inputValue);
+      const sanitizedEmail = DOMPurify.sanitize(emailValue);
 
       try {
         const response = await fetch('/api/send-email', {
@@ -50,7 +65,7 @@ export default function Home() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ message: sanitizedMessage }),
+          body: JSON.stringify({ message: sanitizedMessage, email: sanitizedEmail }),
         });
 
         if (response.ok) {
@@ -71,8 +86,9 @@ export default function Home() {
       }
 
       setInputValue('');
+      setEmailValue('');
     },
-    [inputValue]
+    [inputValue, emailValue]
   );
 
   const handlePageChange = (page: number) => {
@@ -113,18 +129,33 @@ export default function Home() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <div className="grid gap-4 py-4">
-              <div className="">
+              <div>
                 <Label
-                  htmlFor="name"
+                  htmlFor="email"
+                  className="text-right mb-2"
+                >
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={emailValue}
+                  onChange={e => setEmailValue(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="message"
                   className="text-right mb-2"
                 >
                   Link
                 </Label>
                 <Input
-                  id="name"
-                  defaultValue="https://example.com"
+                  id="link"
+                  placeholder="https://example.com"
                   value={inputValue}
-                  onChange={e => setInputValue(DOMPurify.sanitize(e.target.value))}
+                  onChange={e => setInputValue(e.target.value)}
                 />
               </div>
             </div>
