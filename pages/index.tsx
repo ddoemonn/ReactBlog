@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import Link from 'next/link';
 
 import { Exo } from 'next/font/google';
 import { FaReact } from 'react-icons/fa';
+import { toast } from 'sonner';
 
 import { ModeToggle } from '@/components/ModeToggle';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Pagination,
   PaginationContent,
@@ -23,26 +26,18 @@ const exo = Exo({ subsets: ['latin'] });
 
 export default function Home() {
   const [inputValue, setInputValue] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const itemsPerPage = 4;
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setStatus('');
-    }, 5000);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, []);
 
   const handleSubmit = useCallback(
     async (event: React.FormEvent) => {
       event.preventDefault();
 
       if (!inputValue.trim()) {
-        setStatus('Please enter a message');
+        toast('Link status', {
+          description: 'Please enter a message',
+        });
         return;
       }
 
@@ -56,14 +51,20 @@ export default function Home() {
         });
 
         if (response.ok) {
-          setStatus('Link sent successfully');
+          toast('Link status', {
+            description: 'Please enter a message',
+          });
         } else {
           const data = await response.json();
-          setStatus(`Error: ${data.message}`);
+          toast('Link status error', {
+            description: `${data.message}`,
+          });
         }
       } catch (error) {
         console.error('Error:', error);
-        setStatus('Error sending link');
+        toast('Link status error', {
+          description: 'Error sending link',
+        });
       }
 
       setInputValue('');
@@ -77,9 +78,11 @@ export default function Home() {
 
   const reversedItems = [...items].reverse();
 
+  const filteredItems = reversedItems.filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase()));
+
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedItems = reversedItems.slice(startIndex, endIndex);
+  const paginatedItems = filteredItems.slice(startIndex, endIndex);
 
   const totalPages = Math.ceil(items.length / itemsPerPage);
 
@@ -93,19 +96,41 @@ export default function Home() {
         <FaReact className="text-blue-500 w-10 h-10 animate-spin-slow" />
       </div>
       <p className="text-center text-lg mb-5">Submit links to articles, repositories, or anything related to React!</p>
-      <form
-        onSubmit={handleSubmit}
-        className="flex gap-2"
-      >
+      <div className="flex gap-2">
         <Input
-          placeholder="https://example.com"
+          placeholder="Search..."
           className="mx-auto w-96"
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
         />
-        <Button type="submit">Submit</Button>
-      </form>
-      {status && <p className={`pt-3 ${status === 'Link sent successfully' ? 'text-green-500' : 'text-red-500'}`}>{status}</p>}
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>Submit a link</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <div className="grid gap-4 py-4">
+              <div className="">
+                <Label
+                  htmlFor="name"
+                  className="text-right mb-2"
+                >
+                  Link
+                </Label>
+                <Input
+                  id="name"
+                  defaultValue="https://example.com"
+                  value={inputValue}
+                  onChange={e => setInputValue(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={handleSubmit}>Submit</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
       <div className="flex-1 my-5 mt-7 relative">
         {paginatedItems.map((item, index) => (
           <div
